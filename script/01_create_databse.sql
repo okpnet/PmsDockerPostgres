@@ -1,0 +1,2 @@
+CREATE DATABASE avocado;
+CREATE DATABASE test_avocado;

@@ -1,3 +1,4 @@
+\c test_avocado
 --190.create tables
 create table tests.history_mstr_document_content_tree (
     history_id uuid default gen_random_uuid(),
@@ -141,7 +142,7 @@ create table tests.history_mstr_document (
     title varchar(255) default 't',
     control_number varchar(255) not null,
     version_code integer default 1,
-    version_name varchar(16) default "",
+    version_name varchar(16) default '',
     trans_approved_id uuid default null,
     revision integer default 1,
     remarks varchar(1024) default null,
@@ -159,7 +160,7 @@ create table tests.mstr_document (
     title varchar(1024) not null,
     control_number varchar(255) not null,
     version_code integer default 1,
-    version_name varchar(16) default "",
+    version_name varchar(16) default '',
     trans_approved_id uuid not null,
     revision integer default 1,
     remarks varchar(1024) default null,
