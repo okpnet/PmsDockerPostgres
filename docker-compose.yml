@@ -1,7 +1,6 @@
-version: '3'
 services:
   db:
-    image: postgres:14
+    image: ${REGISTRY_HOST}:${REGISTRY_PORT}/postgres:14
     container_name: postgres
     command: -c 'config_file=/etc/postgresql/postgresql.conf' #postgres conf
     ports:
@@ -20,3 +19,8 @@ services:
 
 volumes:
   db-store:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${DB_DATA_PATH}
+      o: bind
