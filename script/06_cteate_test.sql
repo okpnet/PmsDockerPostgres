@@ -1,5 +1,5 @@
 \c test_avocado
---190.create tables
+--188.create tables
 create table tests.history_mstr_document_content_tree (
     history_id uuid default gen_random_uuid(),
     mstr_document_content_tree_id uuid not null,
@@ -1062,17 +1062,6 @@ create table tests.history_mstr_staff_capability (
     mstr_capability_id uuid default null,
     value decimal(5,2) default 0,
     stop boolean default 'f',
-    revision integer default 1,
-    remarks varchar(1024) default null,
-    update_at timestamp default now(),
-    update_user_id uuid default null,
-    update_user_history_id uuid default null,
-    remove boolean default 'f'
-);
-create table tests.history_mstr_signin (
-    history_id uuid default gen_random_uuid(),
-    mstr_signin_id uuid not null,
-    password varchar(1024) not null,
     revision integer default 1,
     remarks varchar(1024) default null,
     update_at timestamp default now(),
@@ -2623,23 +2612,13 @@ create table tests.mstr_staff_capability (
     update_user_history_id uuid default null,
     remove boolean default 'f'
 );
-create table tests.mstr_signin (
-    mstr_signin_id uuid default gen_random_uuid(),
-    password varchar(1024) not null,
-    revision integer default 1,
-    remarks varchar(1024) default null,
-    update_at timestamp default now(),
-    update_user_id uuid default null,
-    update_user_history_id uuid default null,
-    remove boolean default 'f'
-);
 create table tests.mstr_sign (
     mstr_sign_id uuid default gen_random_uuid(),
     info_staff_id uuid not null,
+    token varchar(1024) default null,
     code varchar(255) default null,
     mail varchar(255) default null,
     role smallint default 10,
-    mstr_signin_id uuid default null,
     revision integer default 1,
     remarks varchar(1024) default null,
     update_at timestamp default now(),
@@ -2731,7 +2710,7 @@ create table tests.info_office (
     update_user_history_id uuid default null,
     remove boolean default 'f'
 );
---190.add table comments
+--188.add table comments
 comment on table tests.history_mstr_document_content_tree is '文書コンテンツ体系マスタ履歴';
 comment on column tests.history_mstr_document_content_tree.history_id is '履歴id';
 comment on column tests.history_mstr_document_content_tree.mstr_document_content_tree_id is 'コンテンツ体系id';
@@ -3727,16 +3706,6 @@ comment on column tests.history_mstr_staff_capability.update_at is '更新日時
 comment on column tests.history_mstr_staff_capability.update_user_id is '更新者id';
 comment on column tests.history_mstr_staff_capability.update_user_history_id is '更新者履歴id';
 comment on column tests.history_mstr_staff_capability.remove is '削除';
-comment on table tests.history_mstr_signin is 'サインインマスタ履歴';
-comment on column tests.history_mstr_signin.history_id is '履歴id';
-comment on column tests.history_mstr_signin.mstr_signin_id is 'サインインID';
-comment on column tests.history_mstr_signin.password is 'パスワード';
-comment on column tests.history_mstr_signin.revision is 'レビジョン';
-comment on column tests.history_mstr_signin.remarks is '備考';
-comment on column tests.history_mstr_signin.update_at is '更新日時';
-comment on column tests.history_mstr_signin.update_user_id is '更新者id';
-comment on column tests.history_mstr_signin.update_user_history_id is '更新者履歴id';
-comment on column tests.history_mstr_signin.remove is '削除';
 comment on table tests.history_mstr_sign is 'サインマスタ履歴';
 comment on column tests.history_mstr_sign.history_id is '履歴id';
 comment on column tests.history_mstr_sign.mstr_sign_id is 'サインid';
@@ -5172,22 +5141,13 @@ comment on column tests.mstr_staff_capability.update_at is '更新日時';
 comment on column tests.mstr_staff_capability.update_user_id is '更新者id';
 comment on column tests.mstr_staff_capability.update_user_history_id is '更新者履歴id';
 comment on column tests.mstr_staff_capability.remove is '削除';
-comment on table tests.mstr_signin is 'サインインマスタ';
-comment on column tests.mstr_signin.mstr_signin_id is 'サインインID';
-comment on column tests.mstr_signin.password is 'パスワード';
-comment on column tests.mstr_signin.revision is 'レビジョン';
-comment on column tests.mstr_signin.remarks is '備考';
-comment on column tests.mstr_signin.update_at is '更新日時';
-comment on column tests.mstr_signin.update_user_id is '更新者id';
-comment on column tests.mstr_signin.update_user_history_id is '更新者履歴id';
-comment on column tests.mstr_signin.remove is '削除';
 comment on table tests.mstr_sign is 'サインマスタ';
 comment on column tests.mstr_sign.mstr_sign_id is 'サインid';
 comment on column tests.mstr_sign.info_staff_id is '担当者ID';
+comment on column tests.mstr_sign.token is 'トークン';
 comment on column tests.mstr_sign.code is 'サインコード';
 comment on column tests.mstr_sign.mail is 'メールアドレス';
 comment on column tests.mstr_sign.role is '権限';
-comment on column tests.mstr_sign.mstr_signin_id is 'サインインID';
 comment on column tests.mstr_sign.revision is 'レビジョン';
 comment on column tests.mstr_sign.remarks is '備考';
 comment on column tests.mstr_sign.update_at is '更新日時';
@@ -5273,7 +5233,7 @@ comment on column tests.info_office.update_at is '更新日時';
 comment on column tests.info_office.update_user_id is '更新者id';
 comment on column tests.info_office.update_user_history_id is '更新者履歴id';
 comment on column tests.info_office.remove is '削除';
---190.add table primary key and index
+--188.add table primary key and index
 create unique index history_mstr_document_content_tree_PKI
     on tests.history_mstr_document_content_tree(history_id,mstr_document_content_tree_id);
 alter table tests.history_mstr_document_content_tree
@@ -5574,10 +5534,6 @@ create unique index history_mstr_staff_capability_PKI
     on tests.history_mstr_staff_capability(history_id,mstr_staff_capability_id,info_staff_id);
 alter table tests.history_mstr_staff_capability
     add constraint history_mstr_staff_capability_PKC primary key (history_id,mstr_staff_capability_id,info_staff_id);
-create unique index history_mstr_signin_PKI
-    on tests.history_mstr_signin(history_id,mstr_signin_id);
-alter table tests.history_mstr_signin
-    add constraint history_mstr_signin_PKC primary key (history_id,mstr_signin_id);
 create unique index history_mstr_sign_PKI
     on tests.history_mstr_sign(history_id,mstr_sign_id,info_staff_id);
 alter table tests.history_mstr_sign
@@ -6018,10 +5974,6 @@ create unique index mstr_staff_capability_PKI
     on tests.mstr_staff_capability(mstr_staff_capability_id,info_staff_id);
 alter table tests.mstr_staff_capability
     add constraint mstr_staff_capability_PKC primary key (mstr_staff_capability_id,info_staff_id);
-create unique index mstr_signin_PKI
-    on tests.mstr_signin(mstr_signin_id);
-alter table tests.mstr_signin
-    add constraint mstr_signin_PKC primary key (mstr_signin_id);
 create unique index mstr_sign_PKI
     on tests.mstr_sign(mstr_sign_id,info_staff_id);
 alter table tests.mstr_sign
@@ -6046,7 +5998,7 @@ create unique index info_office_PKI
     on tests.info_office(info_office_id);
 alter table tests.info_office
     add constraint info_office_PKC primary key (info_office_id);
---190.add table foreign key
+--188.add table foreign key
 alter table tests.history_mstr_document_content_tree add constraint history_mstr_document_content_tree_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.history_mstr_document_content add constraint history_mstr_document_content_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.mstr_document_content_tree add constraint mstr_document_content_tree_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
@@ -6115,7 +6067,6 @@ alter table tests.history_mstr_approval_pattern_detail add constraint history_ms
 alter table tests.history_mstr_approval add constraint history_mstr_approval_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.history_info_role add constraint history_info_role_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.history_mstr_staff_capability add constraint history_mstr_staff_capability_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
-alter table tests.history_mstr_signin add constraint history_mstr_signin_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.history_mstr_sign add constraint history_mstr_sign_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.history_info_staff add constraint history_info_staff_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.history_info_provide add constraint history_info_provide_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
@@ -6223,14 +6174,13 @@ alter table tests.mstr_stakeholder_contact add constraint mstr_stakeholder_conta
 alter table tests.mstr_stakeholder add constraint mstr_stakeholder_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.mstr_staff_license add constraint mstr_staff_license_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.mstr_staff_capability add constraint mstr_staff_capability_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
-alter table tests.mstr_signin add constraint mstr_signin_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.mstr_sign add constraint mstr_sign_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.mstr_license add constraint mstr_license_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.mstr_capability add constraint mstr_capability_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.info_staff add constraint info_staff_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.info_department add constraint info_department_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
 alter table tests.info_office add constraint info_office_updater_FK foreign key (update_user_history_id,update_user_id) references tests.history_info_staff (history_id,info_staff_id) DEFERRABLE INITIALLY DEFERRED;
---190.add table trigger
+--188.add table trigger
 -- history_mstr_document_content_tree update trigger
 CREATE OR REPLACE FUNCTION tests.history_mstr_document_content_tree_updatetime() RETURNS trigger AS
 $BODY$
@@ -8259,27 +8209,6 @@ $BODY$
 LANGUAGE plpgsql VOLATILE;
 CREATE TRIGGER history_mstr_staff_capability_updatetimes BEFORE INSERT OR UPDATE OR DELETE ON tests.history_mstr_staff_capability FOR EACH ROW EXECUTE
 PROCEDURE tests.history_mstr_staff_capability_updatetime();
-
--- history_mstr_signin update trigger
-CREATE OR REPLACE FUNCTION tests.history_mstr_signin_updatetime() RETURNS trigger AS
-$BODY$
-DECLARE
-    latest_row record;
-BEGIN
-    IF (TG_OP = 'UPDATE') THEN
-        NEW.update_at:=now();
-        RETURN NEW;
-    ELSEIF (TG_OP='INSERT') THEN
-        NEW.update_at:=now();
-        RETURN NEW;
-    ELSEIF (TG_OP = 'DELETE') THEN
-        RETURN OLD;
-    END IF;
-END
-$BODY$
-LANGUAGE plpgsql VOLATILE;
-CREATE TRIGGER history_mstr_signin_updatetimes BEFORE INSERT OR UPDATE OR DELETE ON tests.history_mstr_signin FOR EACH ROW EXECUTE
-PROCEDURE tests.history_mstr_signin_updatetime();
 
 -- history_mstr_sign update trigger
 CREATE OR REPLACE FUNCTION tests.history_mstr_sign_updatetime() RETURNS trigger AS
@@ -11910,51 +11839,6 @@ LANGUAGE plpgsql VOLATILE;
 CREATE TRIGGER mstr_staff_capability_history BEFORE INSERT OR UPDATE OR DELETE ON tests.mstr_staff_capability FOR EACH ROW EXECUTE
 PROCEDURE tests.mstr_staff_capability_history();
 
--- mstr_signin history trigger
-CREATE OR REPLACE FUNCTION tests.mstr_signin_history() RETURNS trigger AS
-$BODY$
-DECLARE
-    revisions int;
-BEGIN
-    IF (TG_OP = 'UPDATE') OR (TG_OP='INSERT') THEN
-        SELECT Max(revision) INTO revisions FROM tests.history_mstr_signin WHERE mstr_signin_id=NEW.mstr_signin_id;
-        IF (revisions >= 0) THEN
-            NEW.revision := revisions + 1;
-        ELSE
-            NEW.revision := 1;
-        END IF;
-        NEW.update_at := now();
-            INSERT INTO tests.history_mstr_signin (
-                mstr_signin_id,
-                password,
-                revision,
-                remarks,
-                update_at,
-                update_user_id,
-                update_user_history_id,
-                remove
-            )
-            VALUES
-            (
-                NEW.mstr_signin_id,
-                NEW.password,
-                NEW.revision,
-                NEW.remarks,
-                NEW.update_at,
-                NEW.update_user_id,
-                NEW.update_user_history_id,
-                NEW.remove
-            );
-        RETURN NEW;
-    ELSEIF (TG_OP = 'DELETE') THEN
-        RETURN OLD;
-    END IF;
-END
-$BODY$
-LANGUAGE plpgsql VOLATILE;
-CREATE TRIGGER mstr_signin_history BEFORE INSERT OR UPDATE OR DELETE ON tests.mstr_signin FOR EACH ROW EXECUTE
-PROCEDURE tests.mstr_signin_history();
-
 -- mstr_sign history trigger
 CREATE OR REPLACE FUNCTION tests.mstr_sign_history() RETURNS trigger AS
 $BODY$
@@ -11972,10 +11856,10 @@ BEGIN
             INSERT INTO tests.history_mstr_sign (
                 mstr_sign_id,
                 info_staff_id,
+                token,
                 code,
                 mail,
                 role,
-                mstr_signin_id,
                 revision,
                 remarks,
                 update_at,
@@ -11987,10 +11871,10 @@ BEGIN
             (
                 NEW.mstr_sign_id,
                 NEW.info_staff_id,
+                NEW.token,
                 NEW.code,
                 NEW.mail,
                 NEW.role,
-                NEW.mstr_signin_id,
                 NEW.revision,
                 NEW.remarks,
                 NEW.update_at,
