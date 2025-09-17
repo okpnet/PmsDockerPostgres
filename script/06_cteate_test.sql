@@ -2615,7 +2615,7 @@ create table tests.mstr_staff_capability (
 create table tests.mstr_sign (
     mstr_sign_id uuid default gen_random_uuid(),
     info_staff_id uuid not null,
-    token varchar(1024) default null,
+    auth_subject_id uuid not null,
     code varchar(255) default null,
     mail varchar(255) default null,
     role smallint default 10,
@@ -5144,7 +5144,7 @@ comment on column tests.mstr_staff_capability.remove is '削除';
 comment on table tests.mstr_sign is 'サインマスタ';
 comment on column tests.mstr_sign.mstr_sign_id is 'サインid';
 comment on column tests.mstr_sign.info_staff_id is '担当者ID';
-comment on column tests.mstr_sign.token is 'トークン';
+comment on column tests.mstr_sign.auth_subject_id is 'OICD認証ID';
 comment on column tests.mstr_sign.code is 'サインコード';
 comment on column tests.mstr_sign.mail is 'メールアドレス';
 comment on column tests.mstr_sign.role is '権限';
@@ -11856,7 +11856,7 @@ BEGIN
             INSERT INTO tests.history_mstr_sign (
                 mstr_sign_id,
                 info_staff_id,
-                token,
+                auth_subject_id,
                 code,
                 mail,
                 role,
@@ -11871,7 +11871,7 @@ BEGIN
             (
                 NEW.mstr_sign_id,
                 NEW.info_staff_id,
-                NEW.token,
+                NEW.auth_subject_id,
                 NEW.code,
                 NEW.mail,
                 NEW.role,
